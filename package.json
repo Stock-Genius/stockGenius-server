@@ -5,12 +5,12 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon backend/server",
-    "server": "node backend/server",
+    "start": "node server",
+    "server": "nodemon server",
     "client": "npm start --prefix frontend",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "data:import": "node backend/seeder",
-    "data:destroy": "node backend/seeder -d"
+    "dev": "concurrently \"npm run start\" \"npm run client\"",
+    "data:import": "node seeder",
+    "data:destroy": "node seeder -d"
   },
   "keywords": [],
   "author": "",
@@ -31,3 +31,4 @@
     "uuid": "^9.0.1"
   }
 }
+
