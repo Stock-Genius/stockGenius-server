@@ -1,33 +1,21 @@
 const items = [
     {
-        "name": "surf excel",
+        "name": "test item1",
         "buyPrice": 20,
         "sellPrice": 35,
         "qty": 12
     },
     {
-        "name": "dettol",
+        "name": "test item2",
         "buyPrice": 25,
         "sellPrice": 40,
         "qty": 8
     },
     {
-        "name": "colgate",
+        "name": "test item",
         "buyPrice": 15,
         "sellPrice": 30,
         "qty": 15
-    },
-    {
-        "name": "dove soap",
-        "buyPrice": 30,
-        "sellPrice": 50,
-        "qty": 10
-    },
-    {
-        "name": "party biscuits",
-        "buyPrice": 40,
-        "sellPrice": 60,
-        "qty": 20
     }
 ];
 
