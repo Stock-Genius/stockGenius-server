@@ -8,9 +8,9 @@ class itemController {
     // @route   POST /api/items
     // @access  Private
     static addItem = asyncHandler(async (req, res) => {
-        const { name, buyPrice, sellPrice, qty } = req.body;
+        const { name, buyPrice, sellPrice, qty, img, brand } = req.body;
 
-        if (name == '' || buyPrice == '' || sellPrice == '' || qty == '') {
+        if (name == '' || buyPrice == '' || sellPrice == '' || qty == '' || img == "" || brand == "") {
             return res.json({
                 success: false,
                 message: `Please fill all required fields`
@@ -28,9 +28,11 @@ class itemController {
 
         const item = new Item({
             name,
+            brand,
             buyPrice,
             sellPrice,
             qty,
+            img,
             user: req.user._id,
         });
 

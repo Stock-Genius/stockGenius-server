@@ -13,6 +13,11 @@ const itemSchema = mongoose.Schema(
             required: true,
             trim: true,
         },
+        brand: {
+            type: String,
+            required: true,
+            trim: true,
+        },
         buyPrice: {
             type: Number,
             required: true,
@@ -28,6 +33,11 @@ const itemSchema = mongoose.Schema(
             required: true,
             trim: true,
         },
+        img: {
+            type: String,
+            required: true,
+            trim: true
+        }
     },
     {
         timestamps: true,
