@@ -17,9 +17,10 @@ class itemController {
             });
         }
 
-        const itemExist = await Item.findOne({ name });
+        const findByName = await Item.findOne({ name });
+        const findByBrand = await Item.findOne({ brand });
 
-        if (itemExist) {
+        if (findByName && findByBrand) {
             return res.json({
                 success: false,
                 message: `${name} already exists in your inventory`
