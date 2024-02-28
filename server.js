@@ -6,12 +6,14 @@ import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import itemRoutes from './routes/itemRoutes.js';
 import path from 'path';
-import uploadRoutes from './routes/uploadRoutes.js'
+import uploadRoutes from './routes/uploadRoutes.js';
+import cors from "cors";
 
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors);
 dotenv.config();
 connectDB();
 
@@ -19,10 +21,10 @@ connectDB();
 
 app.use('/api/users', userRoutes);
 app.use('/api/items', itemRoutes);
-app.use("/api/upload" , uploadRoutes);
+app.use("/api/upload", uploadRoutes);
 
 
-const __dirname=path.resolve()
+const __dirname = path.resolve()
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.get('/', (req, res) => {
