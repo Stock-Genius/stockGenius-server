@@ -8,9 +8,14 @@ import itemRoutes from './routes/itemRoutes.js';
 import path from 'path';
 import uploadRoutes from './routes/uploadRoutes.js';
 import cors from "cors";
+import morgan from 'morgan';
 
 
 const app = express();
+if (process.env.NODE_ENV === 'PRODUCTION') {
+    app.use(morgan('dev'));
+};
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
@@ -28,7 +33,7 @@ const __dirname = path.resolve()
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.get('/', (req, res) => {
-    res.send('Api is running...')
+    res.send('Api is running....')
 })
 
 const port = process.env.PORT || 4000;

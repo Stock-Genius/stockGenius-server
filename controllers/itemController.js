@@ -3,14 +3,16 @@ import moment from 'moment';
 import Item from '../models/itemModel.js';
 import History from '../models/historyModel.js';
 
+
 class itemController {
+
     // @desc    Add new item
     // @route   POST /api/items
     // @access  Private
     static addItem = asyncHandler(async (req, res) => {
-        const { name, buyPrice, sellPrice, qty, img, brand } = req.body;
+        const { name, buyPrice, sellPrice, qty } = req.body;
 
-        if (name == '' || buyPrice == '' || sellPrice == '' || qty == '' || img == "" || brand == "") {
+        if (!name || !buyPrice || !sellPrice || !qty) {
             return res.json({
                 success: false,
                 message: `Please fill all required fields`
@@ -18,22 +20,19 @@ class itemController {
         }
 
         const findByName = await Item.findOne({ name });
-        const findByBrand = await Item.findOne({ brand });
 
-        if (findByName && findByBrand) {
+        if (findByName) {
             return res.json({
                 success: false,
                 message: `${name} already exists in your inventory`
             });
-        };
+        }
 
         const item = new Item({
             name,
-            brand,
             buyPrice,
             sellPrice,
             qty,
-            img,
             user: req.user._id,
         });
 
@@ -44,6 +43,7 @@ class itemController {
             data: createdItem,
         });
     });
+
 
     // @desc    Fetch user items by user id
     // @route   GET /api/items
@@ -56,12 +56,7 @@ class itemController {
                 message: 'Items fetched successfully',
                 data: items,
             });
-        } else {
-            res.status(404).json({
-                success: false,
-                message: 'Items fethed failed',
-            });
-        };
+        }
     });
 
 
@@ -125,7 +120,6 @@ class itemController {
             item.qty = item.qty > 0 ? item.qty - qty : item.qty;
 
             const updatedItem = await item.save();
-            // console.log(item, 'niow');
 
             if (updatedItem) {
                 await History.create({
@@ -135,7 +129,7 @@ class itemController {
                     qty,
                     sellPrice,
                     buyPrice,
-                    date: moment().format('YYYY-MM-DD')     
+                    date: moment().format('YYYY-MM-DD')
                 });
                 res.json({
                     message: 'Stock updated successfully',
@@ -149,8 +143,7 @@ class itemController {
                 });
             };
         } else {
-            res.json({ message: `${name} is out of stock.` , success: false});
-            // throw new Error('Item is out of stock.');
+            res.json({ message: `${name} is out of stock.`, success: false });
         };
     });
 
@@ -166,11 +159,6 @@ class itemController {
                 message: 'Selling History fetched successfully',
                 data: items,
             });
-        } else {
-            res.status(500).json({
-                success: false,
-                message: 'Internal server error',
-            });
         };
     });
 
@@ -185,7 +173,6 @@ class itemController {
             res.status(200).json({ message: 'Item removed successfully.', });
         } else {
             res.status(404).json({ message: 'Item Not Found.' });
-            // throw new Error('Item Not Found.');
         };
     });
 };

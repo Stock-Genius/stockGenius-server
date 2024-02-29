@@ -23,7 +23,6 @@ const importData = async () => {
             return { ...item, user: adminUser };
         });
         await Item.insertMany(sampleItems);
-        // console.log(sampleItems[0].user['id'],'created');
         console.log('Data Imported!'.green.inverse);
         process.exit();
     } catch (error) {
