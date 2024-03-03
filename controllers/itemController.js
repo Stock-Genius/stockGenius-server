@@ -170,7 +170,7 @@ class itemController {
         const item = await History.findByIdAndDelete(req.params.id);
 
         if (item) {
-            res.status(200).json({ message: 'Item removed successfully.', });
+            res.status(200).json('Item removed successfully.');
         } else {
             res.status(404).json({ message: 'Item Not Found.' });
         };

@@ -16,31 +16,31 @@ class userController {
         const userExists = await User.findOne({ email });
 
         if (name == '' || email == '' || password == '' || confirmPassword == '' || shopname == '' || address == '') {
-            res.json({
+            res.status(401).json({
                 success: false,
                 message: 'Please fill all inputs fields.'
             });
         }
         else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-            res.json({
+            res.status(401).json({
                 success: false,
                 message: `${email} is not a valid email address.`
             });
         }
         else if (userExists) {
-            res.json({
+            res.status(401).json({
                 success: false,
                 message: `Email address already exists.`
             });
         }
         else if (password !== confirmPassword) {
-            res.json({
+            res.status(401).json({
                 success: false,
                 message: `passwords do not matched.`
             });
         }
         else if (password.length < 6) {
-            res.json({
+            res.status(401).json({
                 success: false,
                 message: `Password must be at least 6 characters.`
             });
@@ -70,7 +70,7 @@ class userController {
         const { email, password } = req.body;
 
         if (email === '' || password === '') {
-            res.json({
+            res.status(401).json({
                 success: false,
                 message: 'Please fill all inputs fields.'
             });
