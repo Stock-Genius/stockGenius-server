@@ -10,14 +10,14 @@ class itemController {
     // @route   POST /api/items
     // @access  Private
     static addItem = asyncHandler(async (req, res) => {
-        const { name, buyPrice, sellPrice, qty } = req.body;
+        const { name, buyPrice, sellPrice, qty, img } = req.body;
 
         if (!name || !buyPrice || !sellPrice || !qty) {
             return res.json({
                 success: false,
                 message: `Please fill all required fields`
             });
-        }
+        };
 
         const findByName = await Item.findOne({ name });
 
@@ -33,6 +33,7 @@ class itemController {
             buyPrice,
             sellPrice,
             qty,
+            img,
             user: req.user._id,
         });
 
@@ -78,7 +79,7 @@ class itemController {
     // @route   PUT /api/items/:id
     // @access  Private
     static updateItem = asyncHandler(async (req, res) => {
-        const { name, buyPrice, sellPrice, qty } = req.body;
+        const { name, buyPrice, sellPrice, qty, img } = req.body;
 
         const item = await Item.findById(req.params.id);
 
@@ -87,6 +88,7 @@ class itemController {
             item.buyPrice = buyPrice;
             item.sellPrice = sellPrice;
             item.qty = qty;
+            item.img = img;
 
             const updatedItem = await item.save();
             res.json({
