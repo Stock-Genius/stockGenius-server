@@ -58,7 +58,15 @@ class userController {
             res.status(200).json({
                 success: true,
                 message: 'User Created Successfully',
-                data: { ...user._doc, token: generateToken(user._id) }
+                data: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    shopname: user.shopname,
+                    address: user.address,
+                    isAdmin: user.isAdmin,
+                    token: generateToken(user._id),
+                }            
             });
         };
     });
@@ -82,7 +90,15 @@ class userController {
                 res.status(200).json({
                     success: true,
                     message: 'Login successfully',
-                    data: { ...user._doc, token: generateToken(user._id) }
+                    data: {
+                        _id: user._id,
+                        name: user.name,
+                        email: user.email,
+                        shopname: user.shopname,
+                        address: user.address,
+                        isAdmin: user.isAdmin,
+                        token: generateToken(user._id),
+                    }
                 });
             }
             else {
@@ -94,6 +110,38 @@ class userController {
         };
     });
 
+
+    // @desc    Update user profile
+    // @route   PUT /api/users/profile
+    // @access  Private
+    static updateUserProfile = asyncHandler(async (req, res) => {
+        const user = await User.findById(req.user._id)
+
+        if (user) {
+            user.name = req.body.name || user.name
+            user.email = req.body.email || user.email
+            user.shopname = req.body.shopname || user.shopname
+            user.address = req.body.address || user.address
+            if (req.body.password) {
+                user.password = req.body.password
+            }
+
+            const updatedUser = await user.save()
+
+            res.json({
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                shopname: updatedUser.shopname,
+                address: updatedUser.address,
+                isAdmin: updatedUser.isAdmin,
+                token: generateToken(updatedUser._id),
+            })
+        } else {
+            res.status(404).json({ message: "User Not found" });
+        }
+    })
+
     // @desc    Get user profile
     // @route   GET /api/users/profile
     // @access  Private
@@ -101,19 +149,28 @@ class userController {
         const user = await User.findById(req.user._id);
 
         if (user) {
-            res.status(200).json({
-                success: true,
-                message: 'Login successfully',
-                data: user,
-            });
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                shopname: user.shopname,
+                address: user.address,
+            })
         } else {
             res.status(404).send({
                 message: 'User not found.',
                 success: false,
             })
         }
-    })
+    });
 
+    // @desc    Get all users
+    // @route   GET /api/users
+    // @access  Private/Admin
+    static getUsers = asyncHandler(async (req, res) => {
+        const users = await User.find({});
+        res.json(users);
+    });
 
 
 };
