@@ -107,7 +107,7 @@ class itemController {
     // @access  Private
 
     static sellItem = asyncHandler(async (req, res) => {
-        const { name, buyPrice, sellPrice, qty } = req.body;
+        const { name, buyPrice, sellPrice, qty, img } = req.body;
 
         if (name == '' || buyPrice == '' || sellPrice == '' || qty == '') {
             return res.json({
@@ -129,6 +129,7 @@ class itemController {
                     item: item._id,
                     name,
                     qty,
+                    img,
                     sellPrice,
                     buyPrice,
                     date: moment().format('YYYY-MM-DD')

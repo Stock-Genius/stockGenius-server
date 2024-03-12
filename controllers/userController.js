@@ -11,7 +11,7 @@ class userController {
     // @route   POST /api/users
     // @access  Public
     static register = asyncHandler(async (req, res) => {
-        const { name, email, password, confirmPassword, shopname, address, isAdmin } = req.body;
+        const { name, email, password, confirmPassword, shopname, address, isAdmin, img } = req.body;
 
         const userExists = await User.findOne({ email });
 
@@ -52,7 +52,8 @@ class userController {
                 password,
                 shopname,
                 address,
-                isAdmin
+                isAdmin,
+                img
             });
 
             res.status(200).json({
@@ -65,6 +66,7 @@ class userController {
                     shopname: user.shopname,
                     address: user.address,
                     isAdmin: user.isAdmin,
+                    img: img,
                     token: generateToken(user._id),
                 }            
             });
@@ -97,6 +99,7 @@ class userController {
                         shopname: user.shopname,
                         address: user.address,
                         isAdmin: user.isAdmin,
+                        img: user.img,
                         token: generateToken(user._id),
                     }
                 });
@@ -122,6 +125,8 @@ class userController {
             user.email = req.body.email || user.email
             user.shopname = req.body.shopname || user.shopname
             user.address = req.body.address || user.address
+            user.img = req.body.img || user.img
+
             if (req.body.password) {
                 user.password = req.body.password
             }
@@ -135,6 +140,7 @@ class userController {
                 shopname: updatedUser.shopname,
                 address: updatedUser.address,
                 isAdmin: updatedUser.isAdmin,
+                img: updatedUser.img,
                 token: generateToken(updatedUser._id),
             })
         } else {
@@ -154,6 +160,8 @@ class userController {
                 name: user.name,
                 email: user.email,
                 shopname: user.shopname,
+                img: user.img,
+                isAdmin: user.isAdmin,
                 address: user.address,
             })
         } else {
@@ -171,7 +179,6 @@ class userController {
         const users = await User.find({});
         res.json(users);
     });
-
 
 };
 
