@@ -1,183 +1,182 @@
-import asyncHandler from 'express-async-handler';
-import moment from 'moment';
-import Item from '../models/itemModel.js';
-import History from '../models/historyModel.js';
-
+import asyncHandler from "express-async-handler";
+import moment from "moment";
+import Item from "../models/itemModel.js";
+import History from "../models/historyModel.js";
 
 class itemController {
+  // @desc    Add new item
+  // @route   POST /api/items
+  // @access  Private
+  static addItem = asyncHandler(async (req, res) => {
+    const { name, buyPrice, sellPrice, qty, img, unit = "pcs" } = req.body; // Default unit to 'pcs' if not provided
 
-    // @desc    Add new item
-    // @route   POST /api/items
-    // @access  Private
-    static addItem = asyncHandler(async (req, res) => {
-        const { name, buyPrice, sellPrice, qty, img } = req.body;
+    if (!name || !buyPrice || !sellPrice || !qty) {
+      return res.status(400).json({
+        success: false,
+        message: `Please fill all required fields`,
+      });
+    }
 
-        if (!name || !buyPrice || !sellPrice || !qty) {
-            return res.json({
-                success: false,
-                message: `Please fill all required fields`
-            });
-        };
+    const findByName = await Item.findOne({ name });
 
-        const findByName = await Item.findOne({ name });
+    if (findByName) {
+      return res.status(400).json({
+        success: false,
+        message: `${name} already exists in your inventory`,
+      });
+    }
 
-        if (findByName) {
-            return res.json({
-                success: false,
-                message: `${name} already exists in your inventory`
-            });
-        }
+    const item = new Item({
+      name,
+      buyPrice,
+      sellPrice,
+      qty,
+      img,
+      unit, // Include the unit field in the item creation
+      user: req.user._id,
+    });
 
-        const item = new Item({
-            name,
-            buyPrice,
-            sellPrice,
-            qty,
-            img,
-            user: req.user._id,
+    const createdItem = await item.save();
+    res.status(201).json({
+      success: true,
+      message: "Item saved successfully",
+      data: createdItem,
+    });
+  });
+
+  // @desc    Fetch user items by user id
+  // @route   GET /api/items
+  // @access  Private
+  static getItems = asyncHandler(async (req, res) => {
+    const items = await Item.find({ user: req.user._id });
+    if (items) {
+      res.status(200).json({
+        success: true,
+        message: "Items fetched successfully",
+        data: items,
+      });
+    }
+  });
+
+  // @desc    Delete a item
+  // @route   DELETE /api/items/:id
+  // @access  Private
+  static deleteItem = asyncHandler(async (req, res) => {
+    const item = await Item.findByIdAndDelete(req.params.id);
+
+    if (item) {
+      res
+        .status(200)
+        .json({ message: "Item removed successfully.", success: true });
+    } else {
+      res.status(404).json({ message: "Item Not Found.", success: false });
+    }
+  });
+
+  // @desc    Update a item
+  // @route   PUT /api/items/:id
+  // @access  Private
+  static updateItem = asyncHandler(async (req, res) => {
+    const { name, buyPrice, sellPrice, qty, img, unit } = req.body;
+
+    const item = await Item.findById(req.params.id);
+
+    if (item) {
+      item.name = name;
+      item.buyPrice = buyPrice;
+      item.sellPrice = sellPrice;
+      item.qty = qty;
+      item.img = img;
+      item.unit = unit;
+
+      const updatedItem = await item.save();
+      res.json({
+        message: "Item updated successfully",
+        data: updatedItem,
+        success: true,
+      });
+    } else {
+      res.status(404).json({ message: "Product not found.", success: false });
+    }
+  });
+
+  // @desc    sell a item and add into history
+  // @route   PUT /api/items/sell/:id
+  // @access  Private
+
+  static sellItem = asyncHandler(async (req, res) => {
+    const { name, buyPrice, sellPrice, qty, img, unit } = req.body;    
+
+    if (name == "" || buyPrice == "" || sellPrice == "" || qty == "") {
+      return res.json({
+        success: false,
+        message: `Please select any item`,
+      });
+    }
+
+    const item = await Item.findById(req.params.id);
+
+    if (item && item.qty > 0) {
+      item.qty = item.qty > 0 ? item.qty - qty : item.qty;
+
+      const updatedItem = await item.save();        
+
+      if (updatedItem) {
+        await History.create({
+          user: req.user._id,
+          item: item._id,
+          name,
+          qty,
+          img,
+          sellPrice,
+          buyPrice,
+          unit: unit,
+          date: moment().format("YYYY-MM-DD"),
         });
-
-        const createdItem = await item.save();
-        res.status(201).json({
-            success: true,
-            message: 'Item saved successfully',
-            data: createdItem,
+        res.json({
+          message: "Stock updated successfully",
+          success: true,
+          updatedItem,
         });
-    });
+      } else {
+        res.status(500).json({
+          success: false,
+          message:
+            "500 Internal server error, Item not updated, due to server issue.",
+        });
+      }
+    } else {
+      res.json({ message: `${name} is out of stock.`, success: false });
+    }
+  });
 
+  // @desc    Get all selling history
+  // @route   GET /api/items/sells
+  // @access  Private
 
-    // @desc    Fetch user items by user id
-    // @route   GET /api/items
-    // @access  Private
-    static getItems = asyncHandler(async (req, res) => {
-        const items = await Item.find({ user: req.user._id });
-        if (items) {
-            res.status(200).json({
-                success: true,
-                message: 'Items fetched successfully',
-                data: items,
-            });
-        }
-    });
+  static getSellItems = asyncHandler(async (req, res) => {
+    const items = await History.find({ user: req.user._id });
+    if (items) {
+      res.status(200).json({
+        success: true,
+        message: "Selling History fetched successfully",
+        data: items,
+      });
+    }
+  });
 
+  // @desc    Delete a item
+  // @route   DELETE /api/items/sell:id
+  // @access  Private
+  static deleteSellItem = asyncHandler(async (req, res) => {
+    const item = await History.findByIdAndDelete(req.params.id);
 
-    // @desc    Delete a item
-    // @route   DELETE /api/items/:id
-    // @access  Private
-    static deleteItem = asyncHandler(async (req, res) => {
-        const item = await Item.findByIdAndDelete(req.params.id);
-
-        if (item) {
-            res.status(200).json({ message: 'Item removed successfully.', success: true });
-        } else {
-            res.status(404).json({ message: 'Item Not Found.', success: false });
-        };
-    });
-
-
-    // @desc    Update a item
-    // @route   PUT /api/items/:id
-    // @access  Private
-    static updateItem = asyncHandler(async (req, res) => {
-        const { name, buyPrice, sellPrice, qty, img } = req.body;
-
-        const item = await Item.findById(req.params.id);
-
-        if (item) {
-            item.name = name;
-            item.buyPrice = buyPrice;
-            item.sellPrice = sellPrice;
-            item.qty = qty;
-            item.img = img;
-
-            const updatedItem = await item.save();
-            res.json({
-                message: 'Item updated successfully',
-                data: updatedItem,
-                success: true,
-            });
-        } else {
-            res.status(404).json({ message: 'Product not found.', success: false });
-        };
-    });
-
-
-    // @desc    sell a item and add into history
-    // @route   PUT /api/items/sell/:id
-    // @access  Private
-
-    static sellItem = asyncHandler(async (req, res) => {
-        const { name, buyPrice, sellPrice, qty, img } = req.body;
-
-        if (name == '' || buyPrice == '' || sellPrice == '' || qty == '') {
-            return res.json({
-                success: false,
-                message: `Please select any item`
-            });
-        }
-
-        const item = await Item.findById(req.params.id);
-
-        if (item && item.qty > 0) {
-            item.qty = item.qty > 0 ? item.qty - qty : item.qty;
-
-            const updatedItem = await item.save();
-
-            if (updatedItem) {
-                await History.create({
-                    user: req.user._id,
-                    item: item._id,
-                    name,
-                    qty,
-                    img,
-                    sellPrice,
-                    buyPrice,
-                    date: moment().format('YYYY-MM-DD')
-                });
-                res.json({
-                    message: 'Stock updated successfully',
-                    success: true,
-                    updatedItem,
-                });
-            } else {
-                res.status(500).json({
-                    success: false,
-                    message: '500 Internal server error, Item not updated, due to server issue.'
-                });
-            };
-        } else {
-            res.json({ message: `${name} is out of stock.`, success: false });
-        };
-    });
-
-    // @desc    Get all selling history
-    // @route   GET /api/items/sells
-    // @access  Private
-
-    static getSellItems = asyncHandler(async (req, res) => {
-        const items = await History.find({ user: req.user._id });
-        if (items) {
-            res.status(200).json({
-                success: true,
-                message: 'Selling History fetched successfully',
-                data: items,
-            });
-        };
-    });
-
-
-    // @desc    Delete a item
-    // @route   DELETE /api/items/sell:id
-    // @access  Private
-    static deleteSellItem = asyncHandler(async (req, res) => {
-        const item = await History.findByIdAndDelete(req.params.id);
-
-        if (item) {
-            res.status(200).json('Item removed successfully.');
-        } else {
-            res.status(404).json({ message: 'Item Not Found.' });
-        };
-    });
-};
+    if (item) {
+      res.status(200).json("Item removed successfully.");
+    } else {
+      res.status(404).json({ message: "Item Not Found." });
+    }
+  });
+}
 
 export default itemController;

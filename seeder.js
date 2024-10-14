@@ -13,7 +13,10 @@ connectDB();
 
 const importData = async () => {
     try {
-        await User.deleteMany();
+        // this line of code i was used to add isActive key in all existing users document
+        // const result = await User.updateMany({}, { $set: {isActive: true} });
+        // console.log(result);
+                await User.deleteMany();
         await Item.deleteMany();
         await History.deleteMany();
         const createdUsers = await User.insertMany(users);

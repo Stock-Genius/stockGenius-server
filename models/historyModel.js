@@ -33,6 +33,12 @@ const historySchema = mongoose.Schema(
             required: true,
             trim: true,
         },
+        unit: {
+            type: String,
+            enum: ['kg', 'pcs'], // Allow only "kg" or "pcs"
+            default: 'pcs', // Default to "pcs" for items without a unit specified
+            required: true,
+        },
         date: {
             type: Date,
             required: true

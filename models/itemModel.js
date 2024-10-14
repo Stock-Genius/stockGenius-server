@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-
 const itemSchema = mongoose.Schema(
     {
         user: {
@@ -27,6 +26,12 @@ const itemSchema = mongoose.Schema(
             type: String,
             required: true,
             trim: true,
+        },
+        unit: {
+            type: String,
+            enum: ['kg', 'pcs'], // Allow only "kg" or "pcs"
+            default: 'pcs', // Default to "pcs" for items without a unit specified
+            required: true,
         },
         img: {
             type: String,
