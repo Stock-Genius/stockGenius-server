@@ -9,13 +9,6 @@ REST API for Stock Genius — JWT auth, inventory CRUD, sales history, and image
 - UI: [https://stockgenius.vercel.app](https://stockgenius.vercel.app)
 - API: host this service (Render/Railway/VPS) and set the frontend `REACT_APP_SERVER_URL`
 
-## Screenshots
-
-<!-- Optional: Postman/API docs screenshots -->
-| Auth | Items | Upload |
-| --- | --- | --- |
-| ![Auth](docs/screenshots/auth.png) | ![Items](docs/screenshots/items.png) | ![Upload](docs/screenshots/upload.png) |
-
 ## Key features
 
 - User register/login with bcrypt password hashing and JWT
